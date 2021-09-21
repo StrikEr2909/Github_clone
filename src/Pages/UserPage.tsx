@@ -1,11 +1,17 @@
-import React, { useCallback } from "react";
+//libs
+import React, { lazy, Suspense, useCallback } from "react";
 import { useParams, useHistory } from "react-router-dom";
 
+//components
 import HomeIcon from "@mui/icons-material/Home";
 import IconButton from "@mui/material/IconButton";
-import RepoListByUser from "../Components/RepoListByUser";
+import CircularProgress from "@mui/material/CircularProgress";
 
-const UserPage = (props) => {
+const RepoListByUser = lazy(() => import("../Components/RepoListByUser"));
+
+interface UserPageProps {}
+
+const UserPage = (props: UserPageProps) => {
   const { userId } = useParams<{ userId?: string }>();
   const history = useHistory();
 
@@ -28,7 +34,15 @@ const UserPage = (props) => {
       <div className="flex justify-self-center m-10 text-4xl">
         {`Xanpool Hub Profile for ${userId}`}
       </div>
-      <RepoListByUser userId={userId} />
+      <Suspense
+        fallback={
+          <div className="flex flex-col items-center w-full">
+            <CircularProgress />
+          </div>
+        }
+      >
+        <RepoListByUser userId={userId} />
+      </Suspense>
     </div>
   );
 };

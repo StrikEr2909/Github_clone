@@ -1,24 +1,26 @@
+//libs
 import React, {
   useCallback,
   useEffect,
   useRef,
   useState,
-  useMemo
+  useMemo,
 } from "react";
 import _ from "lodash";
-
-import SearchBar from "../Components/SearchBar";
 import { useHistory } from "react-router-dom";
 
+//component
 import LinearProgress from "@mui/material/LinearProgress";
 import MenuItem from "@mui/material/MenuItem";
 import MenuList from "@mui/material/MenuList";
 import Snackbar from "@mui/material/Snackbar";
 import SnippetFolderIcon from "@mui/icons-material/SnippetFolder";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
+import SearchBar from "../Components/SearchBar";
 
+//hooks
 import useFetchRepoListByUser, {
-  DEFAULT_PAGE_SIZE
+  DEFAULT_PAGE_SIZE,
 } from "./hooks/useFetchRepoListByUser";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
@@ -48,9 +50,9 @@ const RepoListByUser: React.FC<RepoListByUserProps> = (props) => {
     }
   }, []);
 
-  const { loading, data, error, refetch, fetchMore } = useFetchRepoListByUser({
+  const { loading, data, error, fetchMore } = useFetchRepoListByUser({
     userId,
-    onSuccess
+    onSuccess,
   });
 
   const fetchingMore = loading && data;
@@ -62,10 +64,11 @@ const RepoListByUser: React.FC<RepoListByUserProps> = (props) => {
   const onScroll = useCallback(
     (e) => {
       _.defer(() => {
+        // @ts-ignore
         const page = data?.length / DEFAULT_PAGE_SIZE;
         const pageInteger = _.toInteger(page);
 
-        if (!fetchingMore && hasMore) {
+        if (!fetchingMore && hasMore && scrollContainerRef.current) {
           const { scrollHeight, scrollTop } = scrollContainerRef.current;
 
           /* 1.25 depicts that after subtracting the height of container, when 25%
@@ -74,7 +77,7 @@ const RepoListByUser: React.FC<RepoListByUserProps> = (props) => {
             fetchMore({
               keyword,
               userId,
-              page: pageInteger
+              page: pageInteger,
             });
           }
         }
@@ -123,7 +126,7 @@ const RepoListByUser: React.FC<RepoListByUserProps> = (props) => {
       <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
         <Alert onClose={handleClose} severity="error" sx={{ width: "100%" }}>
           {error?.message ||
-            `There was some errors while fething repository for ${userId}!`}
+            `There was some errors while fetching repository for ${userId}!`}
         </Alert>
       </Snackbar>
       <SearchBar
@@ -134,12 +137,13 @@ const RepoListByUser: React.FC<RepoListByUserProps> = (props) => {
       <MenuList>
         <div
           id="scrollableDiv"
+          // @ts-ignore
           ref={scrollContainerRef}
           style={{
             height: SCROLL_CONTAINER_HEIGHT,
             overflow: "auto",
             display: "flex",
-            flexDirection: "column"
+            flexDirection: "column",
           }}
           onScroll={onScroll}
         >
@@ -148,7 +152,12 @@ const RepoListByUser: React.FC<RepoListByUserProps> = (props) => {
 
             return (
               <MenuItem key={repoObj?.id}>
-                <div data-id={name} onClick={onMenuItemClick}>
+                <div
+                  key={repoObj?.id}
+                  data-id={name}
+                  onClick={onMenuItemClick}
+                  className="w-full"
+                >
                   <SnippetFolderIcon fontSize="small" className="mr-1" />
                   {name}
                 </div>

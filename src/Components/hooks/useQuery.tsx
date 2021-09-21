@@ -1,12 +1,17 @@
+//libs
 import { useCallback, useEffect, useRef, useMemo } from "react";
+
+//hooks
 import useFetchData from "./useFetchData";
+
+//types
 import { StringAnyMap } from "../../types/common";
 
 function defaultMergeData(
-  prevData: Array<StringAnyMap>,
-  nextData: Array<StringAnyMap>
+  prevData: Array<StringAnyMap> | null,
+  nextData: Array<StringAnyMap> | null
 ) {
-  return [...prevData, ...nextData];
+  return [...(prevData || []), ...(nextData || [])];
 }
 
 export default function useQuery({
@@ -17,7 +22,7 @@ export default function useQuery({
   onError,
   cancelOnUnmount,
   mergeData = defaultMergeData,
-  dataFetcher
+  dataFetcher,
 }: {
   payload?: StringAnyMap;
   responseAdapter?: (
@@ -25,20 +30,20 @@ export default function useQuery({
     args?: StringAnyMap
   ) => StringAnyMap;
   skip?: boolean;
-  onSuccess?: (response: StringAnyMap) => void;
-  onError?: (error: StringAnyMap) => void;
+  onSuccess?: (response?: StringAnyMap) => void;
+  onError?: (error?: StringAnyMap) => void;
   cancelOnUnmount?: boolean;
   mergeData?: (
-    prevData: Array<StringAnyMap>,
-    nextData: Array<StringAnyMap>
-  ) => StringAnyMap;
-  dataFetcher?: (payload?: StringAnyMap) => Promise<any>;
+    prevData: Array<StringAnyMap> | null,
+    nextData: Array<StringAnyMap> | null
+  ) => Array<StringAnyMap>;
+  dataFetcher: (payload?: StringAnyMap) => Promise<any>;
 }) {
   const skipRef = useRef(skip);
   skipRef.current = skip;
   const initialPayloadRef = useRef(initialPayload);
   initialPayloadRef.current = initialPayload;
-  const prevDataRef = useRef(null);
+  const prevDataRef = useRef<Array<StringAnyMap> | null>(null);
 
   useEffect(() => {
     prevDataRef.current = null;
@@ -50,14 +55,14 @@ export default function useQuery({
     error,
     fetchData,
     cancel,
-    requestParams: params
+    requestParams: params,
   } = useFetchData({
     initialLoading: !skip,
     dataFetcher,
     responseAdapter,
     onSuccess,
     onError,
-    cancelOnUnmount
+    cancelOnUnmount,
   });
 
   const refetch = useCallback(
@@ -78,7 +83,7 @@ export default function useQuery({
     return data || (prevDataRef.current ? prevDataRef.current : data);
   }, [data, mergeData]);
 
-  const combinedDataRef = useRef(combinedData);
+  const combinedDataRef = useRef<Array<StringAnyMap> | null>(combinedData);
   combinedDataRef.current = combinedData;
 
   const fetchMore = useCallback(
@@ -104,6 +109,6 @@ export default function useQuery({
     error,
     refetch,
     fetchMore,
-    requestParams: params ? params[0] : undefined
+    requestParams: params ? params[0] : undefined,
   };
 }

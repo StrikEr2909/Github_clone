@@ -1,7 +1,11 @@
+//libs
 import _ from "lodash";
 import { useState, useEffect, useCallback, useRef } from "react";
+
+//hooks
 import useMountedState from "react-use/lib/useMountedState";
 
+//types
 import { StringAnyMap } from "../../types/common";
 
 function cancelReq(reqPromiseRef: StringAnyMap, currentReqIdRef: StringAnyMap) {
@@ -26,7 +30,7 @@ export default function useFetchData({
   onSuccess = _.noop,
   onError = _.noop,
   initialLoading = true,
-  cancelOnUnmount = true
+  cancelOnUnmount = true,
 }: {
   responseAdapter?: (response: StringAnyMap) => StringAnyMap;
   onSuccess?: (response?: StringAnyMap, args?: StringAnyMap) => void;
@@ -34,15 +38,25 @@ export default function useFetchData({
   cancelOnUnmount?: boolean;
   initialLoading?: boolean;
   dataFetcher: (payload?: StringAnyMap) => Promise<any>;
-}) {
+}): {
+  error: StringAnyMap | undefined;
+  loading: boolean;
+  data: Array<StringAnyMap> | null;
+  fetchData: (...args: any[]) => { promise: any; cancel: () => void };
+  cancel: () => void;
+  requestParams?: StringAnyMap;
+} {
   const [loading, setLoading] = useState(initialLoading);
-  const [dataAndReqParams, setDataAndRequestParams] = useState({
+  const [dataAndReqParams, setDataAndRequestParams] = useState<{
+    data: any;
+    requestParams: any;
+  }>({
     data: undefined,
-    requestParams: undefined
+    requestParams: undefined,
   });
-  const [error, setError] = useState(undefined);
-  const ongoingReqRef = useRef(null);
-  const currentReqIdRef = useRef(null);
+  const [error, setError] = useState<StringAnyMap | undefined>(undefined);
+  const ongoingReqRef = useRef<any>(null);
+  const currentReqIdRef = useRef<string>(null);
   const cancelOnUnmountRef = useRef(cancelOnUnmount);
   const onSuccessRef = useRef(onSuccess);
   const onErrorRef = useRef(onSuccess);
@@ -71,24 +85,25 @@ export default function useFetchData({
       setDataAndRequestParams({ data: undefined, requestParams: undefined });
       setError(undefined);
       const reqId = _.uniqueId("reqId");
+      // @ts-ignore
       currentReqIdRef.current = reqId;
       ongoingReqRef.current = dataFetcher(...args);
 
       ongoingReqRef.current
         .then(
-          (response) => {
+          (response: any) => {
             onSuccessRef.current(response, args);
             if (isStale(reqId, currentReqIdRef, isMounted)) {
               return undefined;
             }
             setDataAndRequestParams({
               data: responseAdapterRef.current(response),
-              requestParams: args
+              requestParams: args,
             });
             setError(undefined);
             return response;
           },
-          (e) => {
+          (e: StringAnyMap) => {
             onErrorRef.current(e);
             if (isStale(reqId, currentReqIdRef, isMounted)) {
               return;
@@ -106,7 +121,7 @@ export default function useFetchData({
 
       return {
         promise: ongoingReqRef.current,
-        cancel: () => cancelReq(ongoingReqRef, currentReqIdRef)
+        cancel: () => cancelReq(ongoingReqRef, currentReqIdRef),
       };
     },
     [setDataAndRequestParams, dataFetcher, isMounted]
@@ -118,6 +133,6 @@ export default function useFetchData({
     error,
     fetchData,
     cancel,
-    requestParams: dataAndReqParams.requestParams
+    requestParams: dataAndReqParams.requestParams,
   };
 }

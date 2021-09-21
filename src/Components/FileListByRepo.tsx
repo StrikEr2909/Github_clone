@@ -1,21 +1,23 @@
+//libs
 import React, {
   useCallback,
   useEffect,
   useRef,
   useState,
-  useMemo
+  useMemo,
 } from "react";
 import _ from "lodash";
 
-import SearchBar from "../Components/SearchBar";
-
+//components
 import MenuItem from "@mui/material/MenuItem";
 import MenuList from "@mui/material/MenuList";
 import Snackbar from "@mui/material/Snackbar";
 import DescriptionIcon from "@mui/icons-material/Description";
 import FolderIcon from "@mui/icons-material/Folder";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
+import SearchBar from "../Components/SearchBar";
 
+//hooks
 import useFetchRepoData from "./hooks/useFetchRepoData";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
@@ -39,7 +41,7 @@ const FileListByRepo: React.FC<FileListByRepoProps> = (props) => {
 
   const { loading, data, error } = useFetchRepoData({
     userId,
-    repoName
+    repoName,
   });
 
   const onChange = useCallback((updatedKeyword) => {
@@ -90,7 +92,7 @@ const FileListByRepo: React.FC<FileListByRepoProps> = (props) => {
             height: SCROLL_CONTAINER_HEIGHT,
             overflow: "auto",
             display: "flex",
-            flexDirection: "column"
+            flexDirection: "column",
           }}
         >
           {_.map(filteredData, (fileObj) => {
@@ -100,11 +102,19 @@ const FileListByRepo: React.FC<FileListByRepoProps> = (props) => {
 
             return (
               <MenuItem key={fileObj?.git_url}>
-                <div data-id={name}>
+                <div data-id={name} key={fileObj?.git_url} className="w-full">
                   {isDirectory ? (
-                    <FolderIcon fontSize="small" className="mr-1" />
+                    <FolderIcon
+                      fontSize="small"
+                      className="mr-1"
+                      data-testid="folder-icon"
+                    />
                   ) : (
-                    <DescriptionIcon fontSize="small" className="mr-1" />
+                    <DescriptionIcon
+                      fontSize="small"
+                      className="mr-1"
+                      data-testid="file-icon"
+                    />
                   )}
                   {name}
                 </div>

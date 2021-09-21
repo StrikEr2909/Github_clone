@@ -1,7 +1,9 @@
+//libs
 import { useCallback, useMemo } from "react";
-import useQuery from "./useQuery";
-
 import axios from "axios";
+
+//hooks
+import useQuery from "./useQuery";
 
 const EMPTY_STRING = "";
 
@@ -40,7 +42,6 @@ const useFetchRepoListByUser = (params: {
     responseAdapter,
     payload,
     dataFetcher: fetchUserApi,
-    onSuccess: params?.onSuccess
   });
 
   return {

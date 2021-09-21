@@ -1,15 +1,21 @@
+//libs
 import React, { useCallback, useMemo, useState } from "react";
+import axios from "axios";
+
+//hooks
 import useQuery from "./useQuery";
-import { StringAnyMap } from "../../types/common";
+
+//utils
 import { serializeUrlParams } from "../../utils/generalUtils";
 
-import axios from "axios";
+//types
+import { StringAnyMap } from "../../types/common";
 
 export const DEFAULT_PAGE_SIZE = 20;
 
 const useFetchRepoListByUser = (params: {
   userId?: string;
-  onSuccess?: (response: StringAnyMap) => void;
+  onSuccess?: (response?: StringAnyMap) => void;
 }) => {
   const userId = params?.userId;
 

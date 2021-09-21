@@ -1,13 +1,19 @@
-import React, { useCallback } from "react";
+//libs
+import React, { useCallback, lazy, Suspense } from "react";
 import { useParams, useHistory } from "react-router-dom";
 
-import FileListByRepo from "../Components/FileListByRepo";
-import ReadMeComponent from "../Components/ReadMeComponent";
+//components
 import HomeIcon from "@mui/icons-material/Home";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import IconButton from "@mui/material/IconButton";
+import CircularProgress from "@mui/material/CircularProgress";
 
-const RepositoryPage = (props) => {
+interface RepositoryPageProps {}
+
+const FileListByRepo = lazy(() => import("../Components/FileListByRepo"));
+const ReadMeComponent = lazy(() => import("../Components/ReadMeComponent"));
+
+const RepositoryPage = (props: RepositoryPageProps) => {
   const { userId, repoName } = useParams<{
     userId?: string;
     repoName?: string;
@@ -45,8 +51,16 @@ const RepositoryPage = (props) => {
       <div className="flex justify-self-center m-10 text-2xl">
         {`Xanpool Hub Repository ${repoName} for ${userId}`}
       </div>
-      <FileListByRepo userId={userId} repoName={repoName} />
-      <ReadMeComponent userId={userId} repoName={repoName} />
+      <Suspense
+        fallback={
+          <div className="flex flex-col items-center w-full">
+            <CircularProgress />
+          </div>
+        }
+      >
+        <FileListByRepo userId={userId} repoName={repoName} />
+        <ReadMeComponent userId={userId} repoName={repoName} />
+      </Suspense>
     </div>
   );
 };

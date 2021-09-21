@@ -1,6 +1,8 @@
+//libs
 import React, { useState, useCallback, useMemo } from "react";
 import _ from "lodash";
 
+//components
 import TextField from "@mui/material/TextField";
 import CircularProgress from "@mui/material/CircularProgress";
 
@@ -13,14 +15,9 @@ interface SearchBarProps {
 
 const INPUT_PROPS = {
   inputProps: {
-    "data-testid": "search-input"
+    "data-testid": "search-input",
   },
-  endAdornment: (
-    <CircularProgress
-      size={20}
-      data-testid="search-bar-loader"
-    ></CircularProgress>
-  )
+  endAdornment: <CircularProgress size={20} data-testid="search-bar-loader" />,
 };
 
 const SearchBar: React.FC<SearchBarProps> = (props) => {

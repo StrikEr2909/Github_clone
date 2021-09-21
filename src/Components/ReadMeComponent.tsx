@@ -1,12 +1,17 @@
+//libs
 import React, { useCallback, useEffect, useState, useMemo } from "react";
-import _ from "lodash";
 import { useHistory } from "react-router-dom";
 
+//components
 import Snackbar from "@mui/material/Snackbar";
+import ReactMarkdown from "react-markdown";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
-import ReactMarkdown from "react-markdown";
+//hooks
 import useFetchRepoData from "./hooks/useFetchRepoData";
+
+//types
+import { StringAnyMap } from "../types/common";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -28,7 +33,7 @@ const ReadMeComponent: React.FC<FileListByRepoProps> = (props) => {
   const { loading, data, error } = useFetchRepoData({
     userId,
     repoName,
-    filePath: "README.md"
+    filePath: "README.md",
   });
 
   useEffect(() => {
@@ -58,8 +63,9 @@ const ReadMeComponent: React.FC<FileListByRepoProps> = (props) => {
           <div className="text-2xl">README.md</div>
           <div className="flex mt-2 flex-col">
             {loading ? (
-              <CircularProgress />
+              <CircularProgress data-testid="read-me-loader" />
             ) : (
+              //@ts-ignore
               <ReactMarkdown>{atob(data?.content || "")}</ReactMarkdown>
             )}
           </div>
